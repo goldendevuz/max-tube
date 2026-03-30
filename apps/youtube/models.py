@@ -3,10 +3,8 @@ from django.conf import settings
 from django_extensions.db.models import TimeStampedModel
 from django.forms.models import model_to_dict
 import hashlib
-
 from cryptography.fernet import Fernet
 from django.conf import settings as dj_settings
-
 
 # =====================================================
 # 🔐 ENCRYPTION CORE
@@ -52,21 +50,30 @@ class EncryptedCharField(models.CharField):
 
 
 # =====================================================
-# 🔍 HASH MIXIN (SEARCH)
+# 🔍 AUTO ENCRYPT + HASH MIXIN
 # =====================================================
-class HashMixin:
-    HASH_FIELDS = []
+class AutoEncryptHashMixin:
+    HASH_FIELDS = []  # agar kerak bo'lsa, url va shunga o'xshash fieldlar
 
     def generate_hash(self, value):
         return hashlib.sha256(value.encode()).hexdigest()
 
     def save(self, *args, **kwargs):
+        # 1️⃣ Hash yaratish
         for field in self.HASH_FIELDS:
             value = getattr(self, field, None)
             if value:
                 setattr(self, f"{field}_hash", self.generate_hash(value))
             else:
                 setattr(self, f"{field}_hash", None)
+
+        # 2️⃣ Char/Text fieldlarni encrypt qilish (EncryptedTextField ishlaydi)
+        for field in self._meta.get_fields():
+            if isinstance(field, (models.CharField, models.TextField)) and hasattr(self, field.name):
+                val = getattr(self, field.name)
+                if val is not None:
+                    setattr(self, field.name, val)  # Encrypted field auto-encrypt qiladi
+
         super().save(*args, **kwargs)
 
 
@@ -91,7 +98,6 @@ class AuditLog(models.Model):
     object_id = models.CharField(max_length=100)
     action = models.CharField(max_length=10, choices=ACTION_CHOICES)
     changes = models.JSONField(null=True, blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -170,7 +176,7 @@ class Category(AuditMixin, TimeStampedModel):
         return self.name or ""
 
 
-class Channel(AuditMixin, HashMixin, TimeStampedModel):
+class Channel(AuditMixin, AutoEncryptHashMixin, TimeStampedModel):
     HASH_FIELDS = ["url"]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -217,7 +223,7 @@ class Reminder(AuditMixin, TimeStampedModel):
         return str(self.time)
 
 
-class Video(AuditMixin, HashMixin, TimeStampedModel):
+class Video(AuditMixin, AutoEncryptHashMixin, TimeStampedModel):
     HASH_FIELDS = ["url"]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -259,7 +265,7 @@ class Video(AuditMixin, HashMixin, TimeStampedModel):
         ]
 
 
-class Playlist(AuditMixin, HashMixin, TimeStampedModel):
+class Playlist(AuditMixin, AutoEncryptHashMixin, TimeStampedModel):
     HASH_FIELDS = ["url"]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
