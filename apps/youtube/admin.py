@@ -13,7 +13,8 @@ from .models import (
     Playlist,
     Video,
     Category,
-    Channel
+    Channel,
+    AuditLog
 )
 
 
@@ -218,3 +219,12 @@ def update_channel_date_day(modeladmin, request, queryset):
         checkout = obj.checkout + relativedelta(days=1)
         obj.checkout = checkout
         obj.save()
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("model", "object_id", "action", "user", "created_at")
+    list_filter = ("model", "action", "created_at")
+    search_fields = ("model", "object_id")
+    readonly_fields = ("model", "object_id", "action", "user", "changes", "created_at")
+
