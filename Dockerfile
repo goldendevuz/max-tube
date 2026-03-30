@@ -18,10 +18,8 @@ RUN apt-get update \
 RUN curl -Ls https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
-# Copy lockfile first
 COPY requirements.lock .
 
-# Install deps into system python
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --system --no-cache-dir -r requirements.lock
 
@@ -36,7 +34,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Create user with same UID as host (IMPORTANT)
+# Create user
 RUN useradd -u 1000 -m appuser
 
 # Copy python + binaries
@@ -45,20 +43,21 @@ COPY --from=builder /usr/local /usr/local
 # Copy app
 COPY . /app/
 
-# Ensure directories exist
-RUN mkdir -p /app/data /app/staticfiles /app/media
-
-# Fix permissions
-RUN chown -R appuser:appuser /app
+# Create dirs + set ownership (build-time)
+RUN mkdir -p /app/data /app/staticfiles /app/media \
+ && chown -R appuser:appuser /app
 
 # Entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# 🔥 MUHIM: entrypoint root sifatida ishlaydi
+USER root
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Keyin appuser ga tushadi
 USER appuser
 
 EXPOSE 8000
-
-ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "60"]
