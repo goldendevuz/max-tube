@@ -10,7 +10,7 @@ from pathlib import Path
 
 MODE = "file"  # "list" or "file"
 INPUT_FILE = "requirements.txt"
-OUTPUT_FILE = "requirements.lock.txt"
+OUTPUT_FILE = "requirements.lock"
 
 PACKAGES_LIST = [
     "psycopg2-binary", "python-dotenv", "uvicorn", "Django"

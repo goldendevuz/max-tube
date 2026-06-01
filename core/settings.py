@@ -139,16 +139,13 @@ USE_I18N = True
 USE_TZ = True
 
 STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
 }
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-WHITENOISE_MANIFEST_STRICT = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -169,3 +166,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 FIELD_ENCRYPTION_KEY = FIELD_ENCRYPTION_KEY
+
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ADD_HEADERS_FUNCTION = None

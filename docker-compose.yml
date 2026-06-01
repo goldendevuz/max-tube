@@ -2,15 +2,21 @@ services:
   web:
     build:
       context: .
-    env_file: .env
+
+    env_file:
+      - .env
+
     ports:
       - "8000:8000"
+
     volumes:
-      - ./data:/app/data
       - ./db:/app/db
       - ./staticfiles:/app/staticfiles
       - ./media:/app/media
+      - ./data:/app/data
+
     restart: unless-stopped
+
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/ || exit 1"]
       interval: 10s

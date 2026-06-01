@@ -1,5 +1,5 @@
 # =========================
-# 1️⃣ Builder stage
+# Builder stage
 # =========================
 FROM python:3.12-slim AS builder
 
@@ -18,16 +18,14 @@ RUN apt-get update \
 RUN curl -Ls https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
-# Copy lockfile first
-COPY requirements.lock .
+COPY requirements.txt .
 
-# Install deps into system python
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system --no-cache-dir -r requirements.lock
+    uv pip install --system --no-cache-dir -r requirements.txt
 
 
 # =========================
-# 2️⃣ Runtime stage
+# Runtime stage
 # =========================
 FROM python:3.12-slim
 
@@ -36,28 +34,29 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Create user with same UID as host
-RUN useradd -u 1000 -m appuser
+# runtime tools (make included)
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    curl \
+    make \
+ && rm -rf /var/lib/apt/lists/*
 
-# Copy python + binaries
 COPY --from=builder /usr/local /usr/local
-
-# Copy app
 COPY . /app/
 
-# Ensure directories exist
-RUN mkdir -p /app/data /app/staticfiles /app/media
+RUN mkdir -p \
+    /app/db \
+    /app/staticfiles \
+    /app/media \
+    /app/data
 
-# Fix permissions
-RUN chown -R appuser:appuser /app
+RUN touch /app/db/db.sqlite3
 
-# Entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-USER appuser
 
 EXPOSE 8000
 
 ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "60"]
