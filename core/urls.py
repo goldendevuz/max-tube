@@ -23,7 +23,7 @@ from core import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     # health check endpoint
-    path('health/', include('apps.shared.urls')),
+    path("", include("apps.shared.urls")),
     # versioned API (placeholder, adjust as needed)
     path('api/v1/', include('apps.youtube.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

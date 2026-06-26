@@ -12,6 +12,17 @@ if not os.path.exists(env_file_path):
     ic('.env.example faylidan nusxa ko\'chirib shablonni o\'zizga moslang.')
     exit(1)
 
+SECURE_SSL_REDIRECT = config(
+    "SECURE_SSL_REDIRECT",
+    default=False,
+    cast=bool,
+)
+CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
+SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+) if SECURE_SSL_REDIRECT else None
 SECRET_KEY = config('SECRET_KEY', default='djangorestframework')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ADMIN_URL = config('ADMIN_URL', default='admin/')
