@@ -3,50 +3,7 @@ from django.conf import settings
 from django_extensions.db.models import TimeStampedModel
 from django.forms.models import model_to_dict
 import hashlib
-from cryptography.fernet import Fernet
-from django.conf import settings as dj_settings
-
-# =====================================================
-# 🔐 ENCRYPTION CORE
-# =====================================================
-fernet = Fernet(dj_settings.FIELD_ENCRYPTION_KEY)
-
-
-def encrypt(value):
-    if value is None:
-        return value
-    return fernet.encrypt(value.encode()).decode()
-
-
-def decrypt(value):
-    if value is None:
-        return value
-    try:
-        return fernet.decrypt(value.encode()).decode()
-    except Exception:
-        return value
-
-
-class EncryptedTextField(models.TextField):
-    def from_db_value(self, value, expression, connection):
-        return decrypt(value)
-
-    def to_python(self, value):
-        return decrypt(value)
-
-    def get_prep_value(self, value):
-        return encrypt(value)
-
-
-class EncryptedCharField(models.CharField):
-    def from_db_value(self, value, expression, connection):
-        return decrypt(value)
-
-    def to_python(self, value):
-        return decrypt(value)
-
-    def get_prep_value(self, value):
-        return encrypt(value)
+from apps.shared.utils.fields import EncryptedTextField, EncryptedCharField
 
 
 # =====================================================

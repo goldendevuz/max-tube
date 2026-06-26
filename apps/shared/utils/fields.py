@@ -1,8 +1,9 @@
-    from django.db import models
-from utils.crypto import encrypt, decrypt
+from django.db import models
+from apps.shared.utils.crypto import encrypt, decrypt
 
 
 class EncryptedTextField(models.TextField):
+    """TextField that automatically encrypts and decrypts values in the database."""
 
     def from_db_value(self, value, expression, connection):
         if value is None:
@@ -21,6 +22,7 @@ class EncryptedTextField(models.TextField):
 
 
 class EncryptedCharField(models.CharField):
+    """CharField that automatically encrypts and decrypts values in the database."""
 
     def from_db_value(self, value, expression, connection):
         if value is None:

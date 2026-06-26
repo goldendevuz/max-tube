@@ -26,8 +26,8 @@ CSRF_COOKIE_SECURE = True
 
 # Application definition
 INSTALLED_APPS = [
-    # 'unfold',
-    'jazzmin',
+    'unfold',
+    # 'jazzmin',
     # default apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,6 +57,7 @@ LOCAL_APPS = [
     'apps.shared',
     'apps.youtube',
     'apps.github',
+    'backend.infrastructure',
 ]
 
 INSTALLED_APPS += THIRD_APPS
