@@ -26,7 +26,7 @@ django-redis==6.0.0
 Pillow==12.2.0
 cryptography==48.0.0
 django-ratelimit==4.1.0
-yt-dlp==2026.3.17
+yt-dlp==2026.6.9
 gunicorn==26.0.0
 django-schema-viewer==0.5.3
 drf-standardized-errors[openapi]==0.16.0
