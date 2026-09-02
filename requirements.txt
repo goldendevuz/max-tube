@@ -2,7 +2,7 @@ python-decouple==3.8
 dj-database-url==3.1.2
 icecream==2.2.0
 tqdm==4.67.3
-Django==6.0.4
+Django==6.0.7
 whitenoise==6.12.0
 django-extensions==4.1
 django-filter==25.2
@@ -15,7 +15,7 @@ django-parler==2.3
 django-parler-rest==2.2
 django-modeltranslation==0.20.3
 django-rosetta==0.10.3
-djangorestframework==3.17.1
+djangorestframework==3.17.2
 djangorestframework-simplejwt==5.5.1
 adrf==0.1.12
 psycopg2-binary==2.9.12
@@ -23,10 +23,10 @@ flower==2.0.1
 django-celery-beat==2.9.0
 django-celery-results==2.6.0
 django-redis==6.0.0
-Pillow==12.2.0
-cryptography==48.0.0
+Pillow==12.3.0
+cryptography==50.0.0
 django-ratelimit==4.1.0
-yt-dlp==2026.6.9
+yt-dlp==2026.7.4
 gunicorn==26.0.0
 django-schema-viewer==0.5.3
 drf-standardized-errors[openapi]==0.16.0
